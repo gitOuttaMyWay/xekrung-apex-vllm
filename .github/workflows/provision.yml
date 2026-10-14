@@ -1,0 +1,14 @@
+name: provision-ghcr
+on: workflow_dispatch
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions: {packages: write, contents: read}
+    steps:
+      - uses: docker/login-action@v3
+        with: {registry: ghcr.io, username: gitOuttaMyWay, password: ${{ secrets.GITHUB_TOKEN }}}
+      - run: |-
+          echo x > t && tar cf tiny.tar t
+          crane append -b hello-world -f tiny.tar -t ghcr.io/gitoutmymyway/xekrung-apex-vllm:provision || true
+        shell: bash
+      - run: echo done
