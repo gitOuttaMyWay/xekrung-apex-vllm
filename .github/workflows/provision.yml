@@ -3,12 +3,17 @@ on: workflow_dispatch
 jobs:
   push:
     runs-on: ubuntu-latest
-    permissions: {packages: write, contents: read}
+    permissions:
+      packages: write
+      contents: read
     steps:
       - uses: docker/login-action@v3
-        with: {registry: ghcr.io, username: gitOuttaMyWay, password: ${{ secrets.GITHUB_TOKEN }}}
-      - run: |-
-          echo x > t && tar cf tiny.tar t
-          crane append -b hello-world -f tiny.tar -t ghcr.io/gitoutmymyway/xekrung-apex-vllm:provision || true
-        shell: bash
-      - run: echo done
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: push tiny image to force package creation
+        run: |
+          docker pull hello-world
+          docker tag hello-world ghcr.io/gitoutmymyway/xekrung-apex-vllm:provision
+          docker push ghcr.io/gitoutmymyway/xekrung-apex-vllm:provision
